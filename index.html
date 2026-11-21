@@ -1,0 +1,365 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Thanksgiving now and next</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700;800&display=swap" rel="stylesheet"><style id="css">
+/* VOICE: calm kitchen display, read from across the room
+   IDEA: an oven control panel beside a recipe card
+   PICTURE: the current step, huge, with a small oven dial badge; a day timeline below
+   COLOUR and TYPE: roast brown night / warm paper day, pumpkin accent; Figtree
+   LAYOUT: now panel fills the screen, next row with countdown ring, timeline, three buttons */
+/* Plain colour values with a prefers-color-scheme dark set, so older Chromium (Silk on Echo Show) renders correctly */
+:root{color-scheme:light dark;--bg:#fbf6ef;--card:#fff;--ink:#2a1a10;--soft:#6d5a4b;--line:#e6dacb;--acc:#c4561a;--accbg:#fbe4d2;--sg:#0f6e56;--sgbg:#dff4ec;--jk:#5b3fb5;--jkbg:#ece8fd;--sm:#185fa5;--smbg:#e2eefa;--ok:#3b6d11;--cold:#2f78c4;--coldbg:#e2eefa;--onacc:#fff;--frost-edge:rgba(90,160,230,.55);--frost-glow:rgba(150,200,245,.45)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16100c;--card:#211812;--ink:#f4ece3;--soft:#bfae9e;--line:#3a2c22;--acc:#f29a4a;--accbg:#3b2312;--sg:#7fdcbc;--sgbg:#123328;--jk:#c3b6ff;--jkbg:#2a2245;--sm:#9cc8f2;--smbg:#14283d;--ok:#a9d77a;--cold:#9cc8f2;--coldbg:#14283d;--onacc:#1b0f06;--frost-edge:rgba(170,215,255,.45);--frost-glow:rgba(190,225,255,.25)}}
+:root[data-theme=light]{color-scheme:light;--bg:#fbf6ef;--card:#fff;--ink:#2a1a10;--soft:#6d5a4b;--line:#e6dacb;--acc:#c4561a;--accbg:#fbe4d2;--sg:#0f6e56;--sgbg:#dff4ec;--jk:#5b3fb5;--jkbg:#ece8fd;--sm:#185fa5;--smbg:#e2eefa;--ok:#3b6d11;--cold:#2f78c4;--coldbg:#e2eefa;--onacc:#fff;--frost-edge:rgba(90,160,230,.55);--frost-glow:rgba(150,200,245,.45)}
+:root[data-theme=dark]{color-scheme:dark;--bg:#16100c;--card:#211812;--ink:#f4ece3;--soft:#bfae9e;--line:#3a2c22;--acc:#f29a4a;--accbg:#3b2312;--sg:#7fdcbc;--sgbg:#123328;--jk:#c3b6ff;--jkbg:#2a2245;--sm:#9cc8f2;--smbg:#14283d;--ok:#a9d77a;--cold:#9cc8f2;--coldbg:#14283d;--onacc:#1b0f06;--frost-edge:rgba(170,215,255,.45);--frost-glow:rgba(190,225,255,.25)}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Figtree,system-ui,sans-serif;overflow-x:hidden;overflow-x:clip}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(12px,2.2vw,28px);gap:clamp(8px,1.4vw,16px);position:relative;z-index:1}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:clamp(14px,1.7vw,20px);color:var(--soft)}
+.top b{color:var(--ink);font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--accbg);color:var(--acc);font-weight:700;white-space:nowrap}
+.pill.q{background:transparent;border:1px solid var(--line);color:var(--soft);font-weight:500}
+.now{flex:1;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,2.4vw,32px);display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,1.2vw,14px)}
+.nhead{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.nhead .clock{justify-self:center}
+.nhead .badge{justify-self:end}
+.badge small{display:block;font-size:12px;font-weight:600;color:var(--soft);line-height:1}
+.badge.off{color:var(--soft)}
+
+.lbl{font-size:clamp(13px,1.5vw,18px);color:var(--soft);font-weight:500}
+.badge{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:999px;font-weight:800;font-size:clamp(16px,2vw,24px);white-space:nowrap}
+.badge svg{width:clamp(34px,4vw,48px);height:auto}
+.alert{display:flex;align-items:center;gap:14px;border-radius:14px;padding:clamp(8px,1.4vh,18px) clamp(14px,2vw,22px);font-weight:800;font-size:clamp(22px,min(4.2vw,6vh),54px);line-height:1.05}
+.alert.up{background:var(--accbg);color:var(--acc)}
+.alert.down{background:var(--coldbg);color:var(--cold)}
+.alert small{display:block;font-size:clamp(13px,1.5vw,18px);font-weight:500;opacity:.85}
+.ico{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico.tile{width:clamp(44px,5.4vw,72px);height:clamp(44px,5.4vw,72px);padding:clamp(8px,1vw,13px);border-radius:16px;background:var(--accbg);color:var(--acc)}
+.ico.sm{width:clamp(26px,2.8vw,36px);height:clamp(26px,2.8vw,36px);color:var(--soft)}
+.ico.xs{width:22px;height:22px;color:var(--acc)}
+.nr{display:flex;align-items:center;gap:clamp(10px,1.4vw,18px)}
+.clock{font-size:clamp(26px,3.6vw,46px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nowk{display:block;font-size:clamp(12px,1.3vw,15px);font-weight:800;color:var(--acc);letter-spacing:.02em}
+.nh{display:flex;align-items:center;gap:12px}
+.tl1{display:flex;align-items:flex-start;gap:8px}
+.task{display:flex;gap:12px;align-items:flex-start}
+.task p{margin:0;font-size:clamp(20px,min(4.6vw,6vh),60px);line-height:1.12;font-weight:700;text-wrap:balance}
+.task.sub p{font-size:clamp(16px,min(2.8vw,3.8vh),34px);font-weight:500}
+.alert ~ .task p{font-size:clamp(18px,min(3.2vw,4.4vh),40px)}
+.task.done p{text-decoration:line-through;color:var(--soft)}
+.chk{flex:none;width:clamp(30px,3.2vw,44px);height:clamp(30px,3.2vw,44px);border-radius:10px;border:2px solid var(--line);background:none;display:grid;place-items:center;font-weight:800;color:var(--ok);margin-top:6px}
+.task.done .chk{border-color:var(--ok)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-left:calc(clamp(30px,3.2vw,44px) + 12px)}
+.tag{font-size:clamp(13px,1.4vw,17px);font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.SG{background:var(--sgbg);color:var(--sg)}.JK{background:var(--jkbg);color:var(--jk)}.SM{background:var(--smbg);color:var(--sm)}.ST{background:transparent;border:1px solid var(--line);color:var(--soft)}
+.next{display:flex;align-items:center;gap:12px;font-size:clamp(16px,2.2vw,28px)}
+.next .nt{flex:1;color:var(--soft)}.next em{font-style:normal;color:var(--ink);font-weight:500}
+.next b{color:var(--acc);white-space:nowrap}
+.nextp{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(12px,1.8vw,22px) clamp(14px,2.4vw,32px);display:flex;flex-direction:column;gap:8px;opacity:.72;-webkit-mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,.35));mask-image:linear-gradient(to bottom,#000 55%,rgba(0,0,0,.35))}
+.nextp .lbl{font-size:clamp(14px,1.7vw,20px)}
+.nextp .cd{font-size:clamp(16px,2vw,24px);color:var(--acc);font-weight:800;white-space:nowrap}
+.nextp .nh{gap:10px}
+.ntask p{margin:0;font-size:clamp(16px,min(3vw,4vh),38px);font-weight:700;line-height:1.15;text-wrap:balance}
+.ntask.sub p{font-size:clamp(14px,min(2.2vw,3vh),28px);font-weight:500}
+.ntask.done p{text-decoration:line-through;color:var(--soft)}
+.nt-tags{margin:6px 0 0}
+.soon{font-size:clamp(14px,1.6vw,20px);font-weight:800;padding:5px 14px;border-radius:999px;white-space:nowrap}
+.ring{flex:none;width:clamp(40px,4.4vw,56px);height:auto}
+.soon.up{background:var(--accbg);color:var(--acc)}.soon.down{background:var(--coldbg);color:var(--cold)}
+.tl{position:relative;height:38px;margin:0 6px}
+.tl .bar{position:absolute;left:0;right:0;top:10px;height:6px;border-radius:3px;background:var(--line)}
+.tl .fill{position:absolute;left:0;top:10px;height:6px;border-radius:3px;background:var(--acc)}
+.tl i{position:absolute;top:7px;width:4px;height:12px;margin-left:-2px;border-radius:2px;background:var(--soft)}
+.tl i.d{background:var(--ok)}
+.tl .me{position:absolute;top:2px;width:4px;height:22px;margin-left:-2px;border-radius:2px;background:var(--ink)}
+.tl span{position:absolute;top:24px;font-size:13px;color:var(--soft);transform:translateX(-50%);white-space:nowrap}
+.acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(8px,1.2vw,14px)}
+.acts button{min-height:52px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:clamp(15px,1.8vw,22px);font-weight:700}
+.acts button.pri{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.sheet{position:fixed;top:0;right:0;bottom:0;left:0;background:var(--bg);overflow-y:auto;padding:clamp(12px,2.2vw,28px);z-index:5}
+.sheet h2{margin:0;font-size:clamp(22px,3vw,34px);line-height:1.05}
+.shead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.shead button,.tbar button{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:700}
+.row{display:grid;grid-template-columns:5.6em 44px minmax(0,1fr) 4.5em;gap:10px;align-items:center;padding:10px 6px;border-bottom:1px solid var(--line)}
+.row.cur{background:var(--accbg);border-radius:10px}
+.row .tm{font-weight:800;white-space:nowrap;text-align:right}
+.row .tm s{display:block;font-size:13px;font-weight:500;color:var(--soft)}
+.row .ov{color:var(--soft);text-align:right;white-space:nowrap;font-size:14px}
+.row .tx{display:flex;flex-direction:column;gap:4px}
+.row.done .tl1>span{text-decoration:line-through;color:var(--soft)}
+.row .chk{margin:0;width:40px;height:40px}
+.row.done .chk{border-color:var(--ok)}
+.note{color:var(--soft);font-size:14px;margin:14px 0}
+.tbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border:2px dashed var(--acc);border-radius:14px;font-size:15px;background:var(--bg)}
+.tbar input{flex:1 1 220px;accent-color:var(--acc);height:32px}
+.tbar b{color:var(--acc);white-space:nowrap}
+.big{font-size:clamp(28px,5vw,64px)!important}
+#fx{position:fixed;top:0;right:0;bottom:0;left:0;pointer-events:none;z-index:0;opacity:0;transition:opacity 1.2s ease}
+#fx.fire,#fx.frost{opacity:1}
+#fx.fire{background:radial-gradient(60% 18vh at 20% 100%,rgba(255,120,30,.55),transparent 70%),radial-gradient(50% 22vh at 55% 100%,rgba(255,70,20,.45),transparent 70%),radial-gradient(55% 16vh at 85% 100%,rgba(255,170,40,.5),transparent 70%)}
+#fx.frost{box-shadow:inset 0 0 clamp(30px,6vw,90px) var(--frost-edge);background:radial-gradient(18vw 18vw at 0 0,var(--frost-glow),transparent 70%),radial-gradient(18vw 18vw at 100% 0,var(--frost-glow),transparent 70%),radial-gradient(18vw 18vw at 0 100%,var(--frost-glow),transparent 70%),radial-gradient(18vw 18vw at 100% 100%,var(--frost-glow),transparent 70%)}
+@media(max-height:680px) and (min-width:601px){#app{padding:10px 16px;gap:8px}.now{padding:12px 20px;gap:6px}.nextp{padding:8px 20px;gap:4px}.ico.tile{width:40px;height:40px;padding:7px}.clock{font-size:clamp(22px,5vh,40px)}.tl{height:30px}.tl span{top:20px}.acts button{min-height:44px}.nt-tags{display:none}.ring{width:36px}}
+@media(max-width:600px){.nhead{grid-template-columns:auto minmax(0,1fr)}.nhead .nh{grid-column:1/-1}.nhead .clock{justify-self:start}.row{grid-template-columns:4.6em 40px minmax(0,1fr)}.row .ov{display:none}.tl span.h{display:none}.next{flex-wrap:wrap}}
+@media(prefers-reduced-motion:no-preference){
+.needle{transition:transform .8s ease}
+.nextp.enter{animation:rise .9s ease-out 1}
+@keyframes rise{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:.72}}
+.pulse{animation:pulse 1.4s ease-out 1}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--acc);transform:scale(1)}30%{box-shadow:0 0 0 10px transparent;transform:scale(1.01)}100%{box-shadow:0 0 0 0 transparent;transform:scale(1)}}
+#fx.fire{animation:flicker 2.6s ease-in-out infinite alternate;transform-origin:50% 100%}
+@keyframes flicker{0%{transform:scaleY(1);filter:brightness(1)}35%{transform:scaleY(1.12);filter:brightness(1.15)}60%{transform:scaleY(.95);filter:brightness(.95)}100%{transform:scaleY(1.08);filter:brightness(1.1)}}
+#fx.frost{animation:shimmer 5s ease-in-out infinite alternate}
+@keyframes shimmer{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+}
+</style><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script></head><body><div id="app"></div><script>
+{
+// Firebase web config. Not secret: database.rules.json limits access to /thanksgiving.
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PASTE_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PASTE_PROJECT_ID",
+  appId: "PASTE_APP_ID"
+};
+const DAY = '2026-11-26';
+const WHO = {SG:'Shelley & Greg', JK:'Jessy & Kyle', SM:'Sam'};
+const S = (h,m,task,who,oven,stove)=>({t:h*60+m,task,who:who||[],oven:oven===undefined?null:oven,stove:!!stove});
+const STEPS = [
+S(7,30,'Preheat the oven',[],325),
+S(7,45,'Egg and sausage casserole in (75 min)',['SG'],325),
+S(9,0,'Casserole out. Raise the oven',['SG'],375),
+S(9,15,'Apple pie in (50–65 min, start checking at 50)',[],375),
+S(10,20,'Apple pie out. Cool on a rack 4 hours (ready by 2:20 PM). Raise the oven',[],425),
+S(10,35,'Pumpkin pie in (15 min)',[],425),
+S(10,50,'Lower the oven and bake the pumpkin pie 40 more min',[],350),
+S(11,0,'While the pumpkin pie bakes, assemble the stuffing. Cover and refrigerate until 3:00 PM',[],350),
+S(11,30,'Pumpkin pie out. Cool 2 hours, then refrigerate by 1:30 PM. Turn the oven off',[],0),
+S(11,45,'Take the turkey out of the fridge, pat dry, rub with compound butter',[]),
+S(12,30,'Preheat the oven',[],350),
+S(12,45,'Turkey in (about 2.5 to 3 hours)',[],350),
+S(13,30,'Glazed ham in, covered with foil (about 2 hours)',[],350),
+S(14,30,'Peel, chop and boil the sweet potatoes, then mash. Hold in the fridge or covered until 3:45 PM',['SG'],null,true),
+S(15,0,'Start checking the turkey temperature. Take the stuffing (and the mashed sweet potatoes, if refrigerated) out of the fridge',[]),
+S(15,10,'Brush the ham with extra glaze',[]),
+S(15,20,'Assemble the green bean casserole, ready for the oven at 4:00',['JK']),
+S(15,30,'Ham out at 140°F. Tent with foil to rest',[]),
+S(15,45,'Turkey out at 165°F. Tent with foil, rest 30 min. Spoon the mashed sweet potatoes into the casserole dish and put in (35–45 min)',['SG']),
+S(15,50,'Stuffing in (35 min)',[]),
+S(15,55,'Start boiling the white potatoes (15–20 min)',['JK'],null,true),
+S(15,55,'At the same time, boil the plain green beans for the kids',['JK'],null,true),
+S(16,0,'Green bean casserole in (25 min)',['JK']),
+S(16,10,'Rolls in to warm (10–15 min)',['SM']),
+S(16,15,"Carve the turkey and slice the ham. Drain the white potatoes and mash with butter and warm milk; drain the kids' green beans",['JK']),
+S(16,20,'Open and serve the cranberries and rolls',['SM']),
+S(16,25,'Take out the stuffing, the sweet potato casserole and the green bean casserole',['SG','JK']),
+S(16,30,'Dinner',[],0)
+];
+
+const ICON = {
+oven:'<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 8.5h17"/><circle cx="7.5" cy="6" r=".6"/><circle cx="10.5" cy="6" r=".6"/><rect x="7" y="11.5" width="10" height="6" rx="1"/>',
+turkey:'<path d="M4.5 15.5c0-4 3.6-7 8.2-7 4 0 6.8 2.4 6.8 5.4 0 2.3-1.9 3.6-4.6 3.6H8c-2 0-3.5-.8-3.5-2z"/><path d="M16.5 9.5l2.7-2.7"/><circle cx="20.2" cy="5.8" r="1.3"/><path d="M3 20h18"/>',
+ham:'<path d="M5 14.5c0-5 4.6-9 9.6-9 3 0 5 2 5 4.8 0 5-4.8 8.7-9.8 8.7-2.9 0-4.8-1.8-4.8-4.5z"/><path d="M9 12.5l3 3M11.5 10l3 3"/><path d="M17.5 7l2.5-2.5"/>',
+pie:'<path d="M3 13.5h18l-2.2 5H5.2z"/><path d="M3 13.5c2.3-4 5.8-6 9-6s6.7 2 9 6"/><path d="M10 10.5l1 1M13.5 10.5l1 1"/>',
+dish:'<path d="M4 11.5h16v4.5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/><path d="M2 12.5h2M20 12.5h2"/><path d="M4.5 11.5c.6-2.6 4-4 7.5-4s6.9 1.4 7.5 4"/><path d="M12 7.5V5.5"/>',
+bowl:'<path d="M3 11.5h18a9 7 0 0 1-18 0z"/><path d="M9 8c0-1.2 1.2-1.2 1.2-2.4M13.5 8c0-1.2 1.2-1.2 1.2-2.4"/>',
+pot:'<path d="M5 9.5h14v7.5a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M3.5 9.5h17M2.5 12h2.5M19 12h2.5"/><path d="M9.5 6.5c0-1.1 1.1-1.1 1.1-2.2M13.5 6.5c0-1.1 1.1-1.1 1.1-2.2"/>',
+thermo:'<path d="M12 3.5a2 2 0 0 1 2 2v8.2a4 4 0 1 1-4 0V5.5a2 2 0 0 1 2-2z"/><path d="M12 9.5v7"/>',
+bread:'<path d="M4 16c0-4.2 3.6-7.5 8-7.5s8 3.3 8 7.5v2H4z"/><path d="M9 11l-.8 3M12 10.2V14M15 11l.8 3"/>',
+knife:'<path d="M14.5 3.5l6 6-9.5 9.5-3-3z"/><path d="M8 16l-4.5 4.5"/>',
+plate:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/>'
+};
+const STEP_ICON = ['oven','dish','dish','pie','pie','pie','pie','bowl','pie','turkey','oven','turkey','ham','pot','thermo','ham','dish','ham','turkey','bowl','pot','pot','dish','bread','knife','bread','dish','plate'];
+const ico = (i, cls) => `<svg class="ico ${cls||''}" viewBox="0 0 24 24" aria-hidden="true">${ICON[STEP_ICON[i]]||ICON.plate}</svg>`;
+// Firebase may return `done` as an array and `shifts` as an object, so normalize every read
+function normalize(val){
+  const out = {done:{}, shifts:[]};
+  if(!val || typeof val !== 'object') return out;
+  const d = val.done || {};
+  Object.keys(d).forEach(k => { if(d[k] && STEPS[+k]) out.done[k] = true; });
+  out.shifts = Object.values(val.shifts || {}).filter(x => x && Number.isFinite(+x.from) && Number.isFinite(+x.mins)).map(x => ({from:+x.from, mins:+x.mins}));
+  return out;
+}
+let state = {done:{},shifts:[]};
+try{ state = normalize(JSON.parse(localStorage.getItem('tg-state')||'null')); }catch(e){}
+const app = document.getElementById('app');
+let db = null, live = false, sync = 'connecting', panel = false;
+let test = location.hash === '#test', testMin = 15*60+47, play = false;
+try{ const tt = JSON.parse(localStorage.getItem('tg-test')||'null'); if(tt && tt.on){ test = true; testMin = tt.min; } }catch(e){}
+const keepTest = () => { try{ localStorage.setItem('tg-test', JSON.stringify({on:test, min:testMin})); }catch(e){} };
+
+const pad = n => String(n).padStart(2,'0');
+const fmt = m => { m = Math.round(m); const h = Math.floor(m/60)%24, mm = m%60; return (h%12||12)+':'+pad(mm)+' '+(h<12?'AM':'PM'); };
+const dur = m => { m = Math.max(0,Math.ceil(m)); return m < 60 ? m+' min' : Math.floor(m/60)+' hr '+(m%60?pad(m%60)+' min':''); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const eff = i => STEPS[i].t + state.shifts.filter(s => s.from <= i).reduce((a,s) => a + s.mins, 0);
+const ovenAt = i => { for(let k=i;k>=0;k--) if(STEPS[k].oven!==null) return STEPS[k].oven; return null; };
+const ovenTxt = v => v === null ? '—' : v === 0 ? 'Off' : v+'°';
+const delay = () => state.shifts.reduce((a,s)=>a+s.mins,0);
+
+function nowMin(){ if(test) return testMin; const d = new Date(); return d.getHours()*60 + d.getMinutes() + d.getSeconds()/60; }
+function dayPhase(){ if(test) return 'on'; const d = new Date(); const k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); return k < DAY ? 'before' : k > DAY ? 'after' : 'on'; }
+
+function slots(now){
+  const idx = STEPS.map((s,i)=>i);
+  const past = idx.filter(i => eff(i) <= now);
+  const fut = idx.filter(i => eff(i) > now);
+  const curT = past.length ? Math.max(...past.map(eff)) : null;
+  const nxtT = fut.length ? Math.min(...fut.map(eff)) : null;
+  return { cur: curT===null ? [] : past.filter(i => eff(i)===curT), next: nxtT===null ? [] : fut.filter(i => eff(i)===nxtT), curT, nxtT };
+}
+
+function tags(s){
+  const t = s.who.map(w => `<span class="tag ${w}">${WHO[w]}</span>`);
+  if(s.stove) t.push('<span class="tag ST">Stove</span>');
+  return t.length ? `<div class="tags">${t.join('')}</div>` : '';
+}
+
+function dial(v){
+  const deg = v ? -135 + Math.min(v,450)/450*270 : -135;
+  let ticks = '';
+  for(let k=0;k<=9;k++){ const a=(-135+k*30)*Math.PI/180; const r1=78,r2=k%2?84:90; ticks+=`<line x1="${100+r1*Math.sin(a)}" y1="${100-r1*Math.cos(a)}" x2="${100+r2*Math.sin(a)}" y2="${100-r2*Math.cos(a)}" stroke="currentColor" stroke-width="${k%2?2:3}" opacity=".5"/>`; }
+  return `<svg viewBox="0 0 200 200" aria-hidden="true" style="color:var(--soft)">
+<circle cx="100" cy="100" r="96" fill="var(--accbg)"/>${ticks}
+<circle cx="100" cy="100" r="62" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+<g class="needle" style="transform-origin:100px 100px;transform:rotate(${deg}deg)"><rect x="96" y="40" width="8" height="46" rx="4" fill="var(--acc)"/></g>
+<circle cx="100" cy="100" r="10" fill="var(--acc)"/></svg>`;
+}
+
+function ovenDir(a,b){ const x = a===null?0:a, y = b===null?0:b; return y > x ? 'up' : y < x ? 'down' : null; }
+function ovenChangeAt(i){ const prev = i>0 ? ovenAt(i-1) : 0; const v = ovenAt(i); const d = ovenDir(prev, v); return d ? {dir:d, v, from:prev||0} : null; }
+function alertTxt(c){ return c.v===0 ? 'Turn the oven off' : (c.dir==='up' ? (c.from===0?'Preheat the oven to ':'Raise the oven to ') : 'Lower the oven to ') + c.v + '°F'; }
+
+function ring(p){ const r=20, C=2*Math.PI*r, f=Math.max(0,Math.min(1,p)); return `<svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--acc)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 24 24)"/></svg>`; }
+
+function timeline(now, on){
+  const a = eff(0), z = eff(STEPS.length-1), pct = t => Math.max(0,Math.min(100,(t-a)/(z-a)*100));
+  const ticks = STEPS.map((s,i) => `<i class="${state.done[i]?'d':''}" style="left:${pct(eff(i)).toFixed(2)}%"></i>`).join('');
+  const hrs = [480,600,720,840,960].map(h => `<span class="h" style="left:${pct(h).toFixed(2)}%">${(Math.floor(h/60)%12||12)}${h<720?' AM':' PM'}</span>`).join('');
+  const me = on && now >= a && now <= z ? `<div class="me" style="left:${pct(now).toFixed(2)}%"></div>` : '';
+  return `<div class="tl" aria-hidden="true"><div class="bar"></div>${on?`<div class="fill" style="width:${pct(now).toFixed(2)}%"></div>`:''}${ticks}${me}${hrs}</div>`;
+}
+
+function nowRight(v, clock){ return `<span class="nr"><span class="clock" aria-label="Current time">${clock}</span>${badge(v)}</span>`; }
+function ago(m){ m = Math.floor(m); return m < 1 ? 'just now' : m < 60 ? m+' min ago' : Math.floor(m/60)+' hr '+(m%60? (m%60)+' min ':'')+'ago'; }
+function badge(v){ return `<span class="badge ${v?'':'off'}" title="Oven setting">${dial(v)}<span><small>Oven</small>${v?v+'°F':'Off'}</span></span>`; }
+
+
+function nextPanel(ringHtml, idxs, at, cd, soon){
+  const first = idxs[0];
+  const tasks = idxs.map((i,k) => `<div class="ntask ${k?'sub':''} ${state.done[i]?'done':''}"><p>${esc(STEPS[i].task)}</p>${tags(STEPS[i]).replace('class="tags"','class="tags nt-tags"')}</div>`).join('');
+  return `<div class="nextp" data-k="${first}"><div class="nhead"><span class="nh">${ringHtml}${ico(first,'sm')}<span class="lbl">Next · ${at}</span><b class="cd">${cd}</b></span>${soon}</div>${tasks}</div>`;
+}
+let lastKey = null;
+const fx = document.createElement('div'); fx.id = 'fx'; document.body.appendChild(fx);
+
+function render(){
+  if(panel){ fx.className=''; return renderList(); }
+  const now = nowMin(), ph = dayPhase(), {cur,next,curT,nxtT} = slots(now);
+  const dinnerT = eff(STEPS.length-1), d = delay();
+  const clock = fmt(now);
+  const status = sync === 'off' ? 'Not set up · this screen only' : live ? 'Live' : sync === 'connecting' ? 'Connecting…' : 'Offline · not syncing';
+  const head = `<div class="top"><span><b>Thanksgiving</b> · Thursday, Nov 26</span><span style="display:flex;gap:8px;flex-wrap:wrap">${d?`<span class="pill">Running ${d} min late</span>`:''}<span class="pill">${now<dinnerT||ph!=='on'?'Dinner '+fmt(dinnerT)+(ph==='on'?' · in '+dur(dinnerT-now):''):'Dinner is served'}</span><span class="pill q">${status}</span></span></div>`;
+  let body, effect = '', key = 'x';
+  if(ph==='after' || (ph==='on' && now >= dinnerT)){
+    key = 'dinner';
+    body = `<div class="now"><div class="nhead"><span class="nh">${ico(STEPS.length-1,"tile")}<span class="lbl"><span class="nowk">Now</span>Started ${fmt(dinnerT)}</span></span><span class="clock" aria-label="Current time">${clock}</span>${badge(ovenAt(STEPS.length-1))}</div><div class="task"><p class="big">Dinner is served. Happy Thanksgiving.</p></div></div>`;
+  } else if(ph==='before' || !cur.length){
+    key = 'pre';
+    body = `<div class="now"><div class="nhead"><span class="nh">${ico(0,'tile')}<span class="lbl">${ph==='before'?'Starts Thursday at '+fmt(eff(0)):'Starts at '+fmt(eff(0))}</span></span><span class="clock" aria-label="Current time">${clock}</span>${badge(0)}</div><div class="task"><p>${esc(STEPS[0].task)}</p></div><div><button data-act="test" style="min-height:48px;padding:0 18px;border-radius:12px;border:2px dashed var(--acc);background:none;color:var(--acc);font-weight:700;font-size:16px">Try a test run</button></div></div>
+`+nextPanel('', [0], fmt(eff(0)), ph==='on'?'in '+dur(eff(0)-now):'Thursday', `<span class="soon up">Preheat to 325°F</span>`);
+  } else {
+    key = 'c'+cur[0];
+    const lastI = cur[cur.length-1], v = ovenAt(lastI);
+    const chg = cur.map(ovenChangeAt).find(Boolean);
+    const chgOpen = chg && !cur.every(i => state.done[i]);
+    if(chgOpen) effect = chg.dir==='up' ? 'fire' : 'frost';
+    const al = chgOpen ? `<div class="alert ${chg.dir}"><div>${alertTxt(chg)}<small>${chg.dir==='up'?'Oven heating up':'Oven cooling down'}</small></div></div>` : '';
+    const nowHtml = cur.map((i,k) => `<div class="task ${k?'sub':''} ${state.done[i]?'done':''}"><button class="chk" data-act="tog" data-i="${i}" aria-label="Mark done">${state.done[i]?'✓':''}</button><p>${esc(STEPS[i].task)}</p></div>${tags(STEPS[i])}`).join('');
+    let nx = '';
+    if(next.length){
+      const nc = next.map(ovenChangeAt).find(Boolean);
+      const soon = nc ? `<span class="soon ${nc.dir}">${nc.v===0?'Turn oven off':(nc.dir==='up'?(nc.from===0?'Preheat to ':'Raise to '):'Lower to ')+nc.v+'°F'}</span>` : '';
+      nx = nextPanel(ring((now-curT)/(nxtT-curT)), next, fmt(nxtT), 'in '+dur(nxtT-now), soon);
+    }
+    body = `<div class="now"><div class="nhead"><span class="nh">${ico(cur[0],"tile")}<span class="lbl"><span class="nowk">Now</span>Started ${fmt(eff(cur[0]))} · ${ago(now-eff(cur[0]))}</span></span><span class="clock" aria-label="Current time">${clock}</span>${badge(v)}</div>${al}${nowHtml}</div>${nx}`;
+  }
+  const acts = `<div class="acts"><button class="pri" data-act="done">Done</button><button data-act="late">Running late +15</button><button data-act="list">Full list</button></div>`;
+  app.innerHTML = head + body + timeline(now, ph==='on') + acts + (test ? testBar() : '');
+  if(lastKey !== null && key !== lastKey){ const n = app.querySelector('.now'); if(n) n.classList.add('pulse'); const np = app.querySelector('.nextp'); if(np) np.classList.add('enter'); }
+  lastKey = key;
+  fx.className = effect;
+  keepTest();
+}
+
+function testBar(){
+  return `<div class="tbar"><b>Test mode · ${fmt(testMin)}</b><input type="range" min="420" max="1000" step="1" value="${Math.round(testMin)}" data-act="slide" aria-label="Test time"><button data-act="play">${play?'Pause':'Play fast'}</button><button data-act="exit">Exit test</button></div>`;
+}
+
+function renderList(){
+  keepTest();
+  const now = nowMin(), cur = dayPhase()==='on' ? slots(now).cur : [];
+  const rows = STEPS.map((s,i) => {
+    const sh = eff(i) - s.t;
+    return `<div class="row ${cur.includes(i)?'cur':''} ${state.done[i]?'done':''}"><span class="tm">${fmt(eff(i))}${sh?`<s>was ${fmt(s.t)}</s>`:''}</span><button class="chk" data-act="tog" data-i="${i}" aria-label="Mark done">${state.done[i]?'✓':''}</button><span class="tx"><span class="tl1">${ico(i,"xs")}<span>${esc(s.task)}</span></span>${s.who.length||s.stove?`<span style="display:flex;gap:6px;flex-wrap:wrap">${s.who.map(w=>`<span class="tag ${w}">${WHO[w]}</span>`).join('')}${s.stove?'<span class="tag ST">Stove</span>':''}</span>`:''}</span><span class="ov">${s.stove?'Stove':ovenTxt(ovenAt(i))}</span></div>`;
+  }).join('');
+  app.innerHTML = `<div class="sheet"><div class="shead"><h2>Thursday, Nov 26</h2><span style="display:flex;gap:8px;flex-wrap:wrap"><button data-act="test">${test?'Exit test':'Test mode'}</button>${delay()?'<button data-act="early">Undo 15 min</button>':''}<button data-act="reset">Reset</button><button data-act="close">Back</button></span></div>${rows}
+<p class="note">Times are estimates. Go by the thermometer: 165°F in the turkey and 140°F in the ham. If the turkey finishes early, keep it tented with foil. Rolls at 4:10 come from the 4:20 step on the printed sheet. Reset clears every checkmark and delay.</p>${test?testBar():''}</div>`;
+}
+
+let confirmReset = false;
+function save(){
+  try{ localStorage.setItem('tg-state', JSON.stringify(state)); }catch(e){}
+  if(db) db.set(state).catch(() => {});
+}
+
+function upcomingIndex(){ const {next} = slots(nowMin()); return next.length ? next[0] : null; }
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a = b.dataset.act;
+  try{ navigator.wakeLock && navigator.wakeLock.request('screen').catch(()=>{}); }catch(err){}
+  if(a==='tog'){ const i = +b.dataset.i; if(state.done[i]) delete state.done[i]; else state.done[i] = true; save(); }
+  else if(a==='done'){ const {cur} = slots(nowMin()); cur.forEach(i => state.done[i] = true); save(); }
+  else if(a==='late'){ const i = upcomingIndex(); if(i!==null){ state.shifts.push({from:i, mins:15}); save(); } }
+  else if(a==='early'){ const i = upcomingIndex(); state.shifts.push({from: i===null?0:i, mins:-15}); if(delay()<0) state.shifts.pop(); save(); }
+  else if(a==='list'){ panel = true; }
+  else if(a==='close'){ panel = false; confirmReset = false; }
+  else if(a==='reset'){ if(!confirmReset){ confirmReset = true; b.textContent = 'Tap again to reset'; return; } state = {done:{},shifts:[]}; confirmReset = false; save(); }
+  else if(a==='test'){ test = !test; play = false; if(test) panel = false; }
+  else if(a==='exit'){ test = false; play = false; }
+  else if(a==='play'){ play = !play; }
+  else return;
+  render();
+});
+app.addEventListener('input', e => { if(e.target.dataset.act==='slide'){ testMin = +e.target.value; play = false; const lb = e.target.parentNode.querySelector('b'); if(lb) lb.textContent = 'Test mode · ' + fmt(testMin); } });
+app.addEventListener('change', e => { if(e.target.dataset.act==='slide'){ testMin = +e.target.value; render(); } });
+
+setInterval(() => { if(test && play){ testMin += 1; if(testMin > 1000) play = false; render(); } }, 1000);
+setInterval(() => { if(!test && !panel) render(); }, 15000);
+
+render();
+
+// Live sync: Firebase Realtime Database at /thanksgiving/state. Last write wins.
+(function connect(){
+  const ok = window.firebase && firebase.database && FIREBASE_CONFIG.databaseURL.indexOf('PASTE_') < 0;
+  if(!ok){
+    sync = window.firebase ? 'off' : 'offline'; render();
+    // SDK failed to load (no network at page load): reload once the connection is back
+    if(!window.firebase) window.addEventListener('online', () => { try{ location.reload(); }catch(e){} });
+    return;
+  }
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const rdb = firebase.database();
+    db = rdb.ref('thanksgiving/state');
+    db.on('value', snap => {
+      state = normalize(snap.val());
+      try{ localStorage.setItem('tg-state', JSON.stringify(state)); }catch(e){}
+      render();
+    }, () => { sync = 'offline'; render(); });
+    rdb.ref('.info/connected').on('value', snap => { live = snap.val() === true; if(live) sync = 'online'; render(); });
+    setTimeout(() => { if(sync === 'connecting'){ sync = 'offline'; render(); } }, 6000);
+  }catch(e){ db = null; sync = 'offline'; render(); }
+})();
+}
+</script></body></html>

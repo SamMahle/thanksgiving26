@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "thanksgiving": {
+      ".read": true,
+      ".write": "now < 1795928400000"
+    }
+  }
+}
